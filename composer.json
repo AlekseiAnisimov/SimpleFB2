@@ -1,5 +1,5 @@
 {
-    "name": "AlekseiAnisimov/SimpleFB2",
+    "name": "aleksei-anisimov/simple-fb2",
     "type": "library",
     "description": "Parsing fb2 files",
     "keywords": ["fb2"],
