@@ -5,7 +5,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "SimpleFb2\\": "src/"
+            "SimpleFB2\\": "src/"
         }
     },
     "authors": [
