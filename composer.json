@@ -1,6 +1,6 @@
 {
     "name": "aleksei-anisimov/simple-fb2",
-    "description": "Fb2 file parser",
+    "description": "fb2 parser",
     "type": "library",
     "license": "MIT",
     "autoload": {
