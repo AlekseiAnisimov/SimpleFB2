@@ -5,7 +5,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "AlekseiAnisimov\\SimpleFb2\\": "src/"
+            "SimpleFb2\\": "src/"
         }
     },
     "authors": [
