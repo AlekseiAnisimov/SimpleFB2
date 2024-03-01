@@ -1,5 +1,5 @@
 <?php
-namespace Simple;
+namespace SimpleFB2;
 
 /**
 * Class Helper

@@ -1,5 +1,5 @@
 <?php
-namespace Simple\Exception;
+namespace SimpleFB2\Exception;
 
 class FieldException extends \Exception
 {

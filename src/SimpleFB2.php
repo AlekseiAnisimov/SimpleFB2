@@ -1,6 +1,6 @@
 <?php
 
-namespace Simple;
+namespace SimpleFB2;
 
 use Simple\Exception;
 use Simple\Exception\FieldException;
@@ -278,7 +278,7 @@ class SimpleFB2
                         foreach ($section as $val) {
                             $notes_list[$note_id] = (string)$val; 
                         }
-                        $this->all_notes[(string)$section->attributes()->id] = trim($str);
+                        $this->all_notes[(string)$section->attributes()->id] = trim($section->description);
                     }
                 }
             }
