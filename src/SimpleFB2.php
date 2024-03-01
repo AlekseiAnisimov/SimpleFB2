@@ -27,6 +27,8 @@ class SimpleFB2
     protected $doc;
     protected $cover_path;
 
+    protected $xml_object;
+
     /**
     * Class constructor
     *
@@ -34,7 +36,7 @@ class SimpleFB2
     */
     public function __construct($book)
     {
-        $this->doc = new \DOMDocument;
+        $this->doc = new DOMDocument;
         $this->book = $book;
     }
 
@@ -59,7 +61,7 @@ class SimpleFB2
         $this->reader = new XMLReader;
         $this->reader->open($this->book);
         while ($this->reader->read()) { 
-            if ($this->reader->nodeType == \XMLReader::ELEMENT) {
+            if ($this->reader->nodeType == XMLReader::ELEMENT) {
                 if ($this->reader->name == 'description') {
                     $this->xml_object = simplexml_import_dom($this->doc->importNode($this->reader->expand(), true));
                     return $this;
@@ -135,7 +137,7 @@ class SimpleFB2
     {
         $cover_href = (string)$this->xml_object->{'title-info'}->coverpage[0]->image[0]->attributes('l', true)->href;
         while ($this->reader->read()) {
-            if ($this->reader->nodeType == \XMLReader::ELEMENT) {
+            if ($this->reader->nodeType == XMLReader::ELEMENT) {
                 if ($this->reader->name == 'binary' && $this->reader->getAttribute('content-type') == 'image/jpeg') {
                     if ($this->reader->getAttribute('id') == 'cover.jpg') {
                         $this->createCover($this->reader);
