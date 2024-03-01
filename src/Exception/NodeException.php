@@ -8,5 +8,3 @@ class NodeException extends \Exception
         $this->message == 'Node not found';
     }
 }
-
-?>

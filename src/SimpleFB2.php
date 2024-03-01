@@ -2,11 +2,13 @@
 
 namespace SimpleFB2;
 
-use Simple\Exception;
-use Simple\Exception\FieldException;
-use Simple\Exception\NodeException;
-use Simple\Exception\EmptyDataException;
-use Simple\Helper;
+use SimpleFB2\Exception;
+use SimpleFB2\Exception\FieldException;
+use SimpleFB2\Exception\NodeException;
+use SimpleFB2\Exception\EmptyDataException;
+use SimpleFB2\Helper;
+use \XMLReader;
+use \DOMDocument;
 
 
 /**
@@ -28,7 +30,7 @@ class SimpleFB2
     /**
     * Class constructor
     *
-    * @param file $book
+    * @param string $book
     */
     public function __construct($book)
     {
@@ -49,12 +51,12 @@ class SimpleFB2
     /**
     * Returns description of book
     *
-    * @return this
+    * @return $this
     */
-    public function description()
+    public function description() 
     {
         $this->reader = NULL;
-        $this->reader = new \XMLReader;
+        $this->reader = new XMLReader;
         $this->reader->open($this->book);
         while ($this->reader->read()) { 
             if ($this->reader->nodeType == \XMLReader::ELEMENT) {
@@ -66,6 +68,8 @@ class SimpleFB2
                 throw new NodeException();
             }
         }
+
+        return $this;
     }
 
     /**
@@ -139,12 +143,14 @@ class SimpleFB2
                 }
             }
         }
+
+        return "";
     }
 
     private function createCover($xml_reader)
     {
         while ($xml_reader->read()) {
-            if ($xml_reader->nodeType == \XMLReader::TEXT) {
+            if ($xml_reader->nodeType == XMLReader::TEXT) {
                 $img_in_str = base64_decode($xml_reader->value);
                 $im = imagecreatefromstring($img_in_str);
                 if ($im !== false) {
@@ -169,11 +175,11 @@ class SimpleFB2
     */
     public function getText()
     {   
-        $reader = new \XMLReader;
+        $reader = new XMLReader;
         $reader->open($this->book);
         $str = '';
         while ($reader->read()) { 
-            if ($reader->nodeType == \XMLReader::ELEMENT) {
+            if ($reader->nodeType == XMLReader::ELEMENT) {
                 if ($reader->name== 'body') { 
                     $xml_object = simplexml_import_dom($this->doc->importNode($reader->expand(), true));
                     $str = $this->readText($xml_object);
@@ -253,10 +259,10 @@ class SimpleFB2
     private function getNote($a)
     {   
         if ($a->attributes()->type == 'note') {
-            print (string)$a->attributes('l', true)->href;
-        } else {
-            throw new FieldException('note');
+            return (string)$a->attributes('l', true)->href;
         }
+
+        return "";
     }
 
     /**
@@ -267,10 +273,10 @@ class SimpleFB2
     public function readNotes()
     {
         $notes_list = [];
-        $reader = new \XMLReader;
+        $reader = new XMLReader;
         $reader->open($this->book);
         while ($reader->read()) {
-            if ($reader->nodeType == \XMLReader::ELEMENT) {
+            if ($reader->nodeType == XMLReader::ELEMENT) {
                 if ($reader->name == 'body' && $reader->getAttribute('name') == 'notes') {
                     $notes_dom = simplexml_import_dom($this->doc->importNode($reader->expand(), true));
                     foreach ($notes_dom->section as $section) {
@@ -287,6 +293,3 @@ class SimpleFB2
     }
 
 }
-
-
-?>

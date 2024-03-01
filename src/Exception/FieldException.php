@@ -8,5 +8,3 @@ class FieldException extends \Exception
         $this->message = "Field '$field' not found";
     }
 }
-
-?>
