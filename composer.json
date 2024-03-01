@@ -1,20 +1,17 @@
 {
     "name": "aleksei-anisimov/simple-fb2",
+    "description": "Fb2 file parser",
     "type": "library",
-    "description": "Parsing fb2 files",
-    "keywords": ["fb2"],
-    "auhors": [
-        {
-            "name": "Aleksei Anisimiv",
-            "email": "ork.04@yandex.ru"
-        }
-    ],
-    "require": {
-        "php":">=5.4.0"
-    },
+    "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Simple\\SimpleFB2\\": "src"
+            "AlekseiAnisimov\\SimpleFb2\\": "src/"
         }
-    }
+    },
+    "authors": [
+        {
+            "name": "AlekseiAnisimov"
+        }
+    ],
+    "require": {}
 }
