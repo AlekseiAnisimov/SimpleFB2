@@ -3,12 +3,14 @@
 namespace SimpleFB2;
 
 use SimpleFB2\Exception;
-use SimpleFB2\Exception\FieldException;
+use SimpleFB2\Exception\FileExistException;
 use SimpleFB2\Exception\NodeException;
 use SimpleFB2\Exception\EmptyDataException;
+use SimpleFB2\Exception\SetFileException;
 use SimpleFB2\Helper;
 use \XMLReader;
 use \DOMDocument;
+use Exception as SystemException;
 
 
 /**
@@ -23,11 +25,15 @@ class SimpleFB2
 {
     public $all_notes = [];
     protected $book;
-    protected $reader;
+
+    /** 
+     * XmlReader cursor
+    */
+    protected $cursor;
     protected $doc;
     protected $cover_path;
 
-    protected $xml_object;
+    protected $description;
 
     /**
     * Class constructor
@@ -37,7 +43,17 @@ class SimpleFB2
     public function __construct($book)
     {
         $this->doc = new DOMDocument;
+        $this->cursor = new XMLReader;
         $this->book = $book;
+        if ($book != null || $book != "") {
+            if (file_exists($book)) {
+                $this->readDescription();
+            } else {
+                throw new FileExistException();
+            }
+        } else {
+            throw new SetFileException();
+        }
     }
 
     public function setCoverPath($path)
@@ -55,15 +71,13 @@ class SimpleFB2
     *
     * @return $this
     */
-    public function description() 
+    protected function readDescription() 
     {
-        $this->reader = NULL;
-        $this->reader = new XMLReader;
-        $this->reader->open($this->book);
-        while ($this->reader->read()) { 
-            if ($this->reader->nodeType == XMLReader::ELEMENT) {
-                if ($this->reader->name == 'description') {
-                    $this->xml_object = simplexml_import_dom($this->doc->importNode($this->reader->expand(), true));
+        $this->cursor->open($this->book);
+        while ($this->cursor->read()) { 
+            if ($this->cursor->nodeType == XMLReader::ELEMENT) {
+                if ($this->cursor->name == 'description') {
+                    $this->description = simplexml_import_dom($this->doc->importNode($this->cursor->expand(), true));
                     return $this;
                 } 
             } else {
@@ -81,7 +95,7 @@ class SimpleFB2
     */
     public function getGenres()
     {
-        return (array)$this->xml_object->{'title-info'}->genre;
+        return (array)$this->description->{'title-info'}->genre;
     }
 
     /**
@@ -94,7 +108,7 @@ class SimpleFB2
     {
         $str = '';
         $author = [];
-        $author_fio = (array)$this->xml_object->{'title-info'}->author;
+        $author_fio = (array)$this->description->{'title-info'}->author;
         if (empty($author_fio)) throw new FieldException('author');
         foreach ($author_fio as $key => $val) {
             if (preg_match("/name/", $key)) {
@@ -112,7 +126,7 @@ class SimpleFB2
 
     public function getBookName()
     {
-        return (string)$this->xml_object->{'title-info'}->{'book-title'};
+        return (string)$this->description->{'title-info'}->{'book-title'};
     }
 
     /**
@@ -123,7 +137,7 @@ class SimpleFB2
 
     public function getDate()
     {
-        return (string)$this->xml_object->{'title-info'}->{'date'};
+        return (string)$this->description->{'title-info'}->{'date'};
     }
 
     /**
@@ -135,12 +149,12 @@ class SimpleFB2
     */
     public function getCover()
     {
-        $cover_href = (string)$this->xml_object->{'title-info'}->coverpage[0]->image[0]->attributes('l', true)->href;
-        while ($this->reader->read()) {
-            if ($this->reader->nodeType == XMLReader::ELEMENT) {
-                if ($this->reader->name == 'binary' && $this->reader->getAttribute('content-type') == 'image/jpeg') {
-                    if ($this->reader->getAttribute('id') == 'cover.jpg') {
-                        $this->createCover($this->reader);
+        $cover_href = (string)$this->description->{'title-info'}->coverpage[0]->image[0]->attributes('l', true)->href;
+        while ($this->cursor->read()) {
+            if ($this->cursor->nodeType == XMLReader::ELEMENT) {
+                if ($this->cursor->name == 'binary' && $this->cursor->getAttribute('content-type') == 'image/jpeg') {
+                    if ($this->cursor->getAttribute('id') == 'cover.jpg') {
+                        $this->createCover($this->cursor);
                     }
                 }
             }
@@ -166,6 +180,38 @@ class SimpleFB2
 
             }
         }
+    }
+
+    /**
+     * Get Annotations
+     * 
+     * @return string
+     */
+    public function getAnnotation() {
+        return $this->description->{'annotation'};
+    }
+
+    /**
+     * Get publication data
+     * 
+     * @return array
+     */
+    public function getPublishInfo() {
+        $publishInfo = [];
+        $cursorPubInfo = $this->description->{'publish-info'};
+        $publishInfo['publisher'] = (string)$cursorPubInfo->{'publisher'};
+        $publishInfo['city'] = (string)$cursorPubInfo->{'city'};
+        $publishInfo['year'] = (string)$cursorPubInfo->{'year'};
+        return $publishInfo;
+    }
+
+    /**
+     * Get Custom Info
+     * 
+     * @return string
+     */
+    public function getCustomInfo() {
+        return (string)$this->description->{'custom-info'};
     }
 
     /**
