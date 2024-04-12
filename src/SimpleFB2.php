@@ -23,17 +23,37 @@ use Exception as SystemException;
 */
 class SimpleFB2
 {
-    public $all_notes = [];
+    /**
+     * List of notes
+    */
+    protected $all_notes = [];
+    /**
+     * Path to book
+    */
     protected $book;
 
     /** 
      * XmlReader cursor
     */
     protected $cursor;
+    /**
+     * DomDocument Object
+    */
     protected $doc;
+    /**
+     * Path to cover of book. Usual it's image
+    */
     protected $cover_path;
 
+    /**
+     * Description of book. Title, authors, etc.
+    */
     protected $description;
+
+    /**
+     * Body of book. Text another words
+    */
+    protected $body;
 
     /**
     * Class constructor
@@ -225,16 +245,15 @@ class SimpleFB2
     {   
         $reader = new XMLReader;
         $reader->open($this->book);
-        $str = '';
         while ($reader->read()) { 
             if ($reader->nodeType == XMLReader::ELEMENT) {
                 if ($reader->name== 'body') { 
                     $xml_object = simplexml_import_dom($this->doc->importNode($reader->expand(), true));
-                    $str = $this->readText($xml_object);
+                    $this->body = $this->readText($xml_object);
                 }
             }
         }
-        return $str;
+        return $this->body;
     
     }
     
@@ -253,7 +272,7 @@ class SimpleFB2
                 case 'title':
                     foreach ($body->$key as $title) {
                         foreach ($title as $name => $name_val) {
-                            print (string)$name_val . "<br>";
+                            $this->body .= (string)$name_val . "<br>";
                         }
                     }
                     break;
@@ -264,34 +283,34 @@ class SimpleFB2
                     $this->readText($val);
                     break;
                 case 'poem':
-                    print "<b>";
+                    $this->body .= "<b>";
                     $this->readText($val);
-                    print "</b>";
+                    $this->body .= "</b>";
                     break;
                 case 'cite':
-                    print "<i>";
+                    $this->body .= "<i>";
                     $this->readText($val);
-                    print "</i>";
+                    $this->body .= "</i>";
                     break;
                 case 'subtitle':
-                    print "<br>";
-                    print "<i>";
+                    $this->body .= "<br>";
+                    $this->body .= "<i>";
                     $this->readText($val);
-                    print "</i>";
+                    $this->body .= "</i>";
                     break;
                 case 'stanza':
-                    print "<br>";
+                    $this->body .= "<br>";
                     $this->readText($val);
-                    print "<br>";
+                    $this->body .= "<br>";
                     break;
                 case 'p':
-                    print (string)$val . "<br>";
+                    $this->body .= (string)$val . "<br>";
                     if ($val->a) {
                         $this->getNote($val->a);
                     }
                     break;
                 case 'v':
-                    print (string)$val . "<br>";
+                    $this->body .= (string)$val . "<br>";
                     break;
             }
         }
