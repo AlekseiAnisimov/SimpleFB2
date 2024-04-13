@@ -276,10 +276,8 @@ class SimpleFB2
                         }
                     }
                     break;
-                case 'epigraph':
-                    $this->readText($val);
-                    break;
                 case 'section':
+                case 'epigraph':
                     $this->readText($val);
                     break;
                 case 'poem':
